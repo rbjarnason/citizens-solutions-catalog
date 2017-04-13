@@ -1,0 +1,20 @@
+<% include ../header.text.ejs %>
+
+<% if (activity.type == 'activity.point.new') { %>
+<%= post.id == user.id ? t('notification.email.pointNewSelf') : t('notification.email.pointNew') %>
+<%= post.name %>
+<%= point.content %>
+<% } %>
+<% if (activity.type == 'activity.point.unhelpful') { %>
+<p><%= post.id == user.id ? t('notification.email.point.unhelpful') : t('notification.email.point.unhelpful_self') %></p>
+<% } %>
+<% if (activity.type == 'activity.point.helpful') { %>
+<p><%= post.id == user.id ? t('notification.email.point.helpful') : t('notification.email.point.helpful_self') %></p>
+<% } if (activity.type == 'activity.report.content') { %>
+    <%= t('notification.email.pointReport') %>
+    <%= post.name %>
+    <%= point.content %>
+<% } %>
+<%= "https://"+community.hostname+"."+domain.domain_name+"/post/"+post.id+"/"+point.id %>
+
+<% include ../footer.text.ejs %>

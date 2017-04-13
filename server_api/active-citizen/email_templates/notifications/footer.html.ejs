@@ -1,0 +1,27 @@
+      </div>
+      <div id="footer" style="padding: 10px;padding-left:16px;padding-top: 20px;text-align: left;background: #edeeef !important;">
+        <div style="padding-bottom: 8px;"><%=t('notification.email.withKindRegards')%></div>
+        <% if (domain.domain_name == 'betrireykjavik.is') { %>
+          <a style="color: #0083e8;" href="https://www.betrireykjavik.is/">Betri Reykjavik</a> |
+          <a style="color: #0083e8;" href="mailto:betrireykjavik@ibuar.is">betrireykjavik@ibuar.is</a> |
+          <a style="color: #0083e8;" href="https://www.betrireykjavik.is/user/open_notification_settings">Tölvupóststillingar</a>
+        <% } %>
+        <% if (domain.domain_name == 'betraisland.is') { %>
+          <a style="color: #0083e8;" href="https://betraisland.is/">Betra Ísland</a> |
+          <a style="color: #0083e8;" href="mailto:betraisland@ibuar.is">betraisland@ibuar.is</a> |
+          <a style="color: #0083e8;" href="https://www.betraisland.is/user/open_notification_settings">Tölvupóststillingar</a>
+        <% } %>
+        <% if (domain.domain_name  == 'yrpri.org') { %>
+          <a style="color: #0083e8;" href="https://yrpri.org/">Your Priorities</a> |
+          <a style="color: #0083e8;" href="mailto:admin@yrpri.org">admin@yrpri.org</a> |
+          <a style="color: #0083e8;" href="https://yrpri.org/user/open_notification_settings">Email Settings</a>
+        <% } %>
+        <% if (domain.domain_name  == 'forbrukerradet.no') { %>
+          <a style="color: #0083e8;" href="https://mineideer.forbrukerradet.no">Forbrukerrådet – 'Mine idéer'</a> |
+          <a style="color: #0083e8;" href="mailto:mineideer@forbrukerradet.no">mineideer@forbrukerradet.no</a> |
+          <a style="color: #0083e8;" href="https://mineideer.forbrukerradet.no/user/open_notification_settings">Varselinnstillinger</a>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>

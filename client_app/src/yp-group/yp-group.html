@@ -1,0 +1,642 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/app-layout/app-scrollpos-control/app-scrollpos-control.html">
+
+<link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+
+<link rel="import" href="../yp-behaviors/app-helpers.html">
+<link rel="import" href="../yp-behaviors/yp-scroll-tab-behavior.html">
+<link rel="import" href="../yp-behaviors/yp-news-tab-selected.html">
+
+<link rel="import" href="../ac-activities/ac-activities.html">
+<link rel="import" href="../yp-page/yp-page.html">
+
+<link rel="import" href="../yp-ajax/yp-ajax.html">
+<link rel="import" href="../yp-post/yp-post-card.html">
+<link rel="import" href="../yp-post/yp-post-card-add.html">
+
+<link rel="import" href="../yp-posts-filter/yp-posts-filter.html">
+<link rel="import" href="../yp-post/yp-post-list.html">
+<link rel="import" href="../yp-post/yp-post-map.html">
+<link rel="import" href="../yp-theme/yp-theme-behavior.html">
+
+<link rel="import" href="../yp-post/yp-post-edit.html">
+<link rel="import" href="../yp-group/yp-group-edit.html">
+
+<link rel="import" href="yp-group-card-large.html">
+
+<dom-module id="yp-group">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      .objectives {
+        padding-bottom: 40px;
+        max-width: 432px;
+      }
+
+      .description {
+        padding: 12px;
+      }
+
+      yp-ajax {
+        background-color: var(--primary-background-color);
+      }
+
+      .counterInfo {
+        font-size: 11px;
+      }
+
+      .topContainer {
+        margin-top: 16px;
+      }
+
+      .createFab {
+        background-color: var(--accent-color);
+        color: var(--icon-general-color, #FFF);
+        position: fixed;
+        bottom: 24px;
+        right: 28px;
+      }
+
+      .createFab[wide-layout] {
+        width: 72px;
+        height: 72px;
+      }
+
+      .createFabContainer[wide-layout] .createFab {
+      }
+
+      paper-fab[wide-layout]::shadow #icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      .topArea {
+        background-color: var(--primary-background-color);
+        background-image: var(--top-area-background-image, none);
+        height: 300px;
+      }
+
+      .tabs {
+        width: 1100px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+      }
+
+      .tabs .tab {
+        width: 250px;
+      }
+
+      .largeAddButton {
+        margin-bottom: 8px;
+      }
+
+      @media (max-width: 1024px) {
+        .tabs {
+          max-width: 920px;
+        }
+
+        .tabs .tab {
+          width: 200px;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .tabs {
+          max-width: 450px;
+          font-size: 14px;
+          word-wrap: break-word !important;
+        }
+
+        .tabs[has-non-open-posts] {
+          font-size: 10px;
+        }
+
+        .counterInfo[has-non-open-posts] {
+          font-size: 9px;
+        }
+
+        .tabs .tab {
+          width: 120px;
+          word-wrap: break-word !important;
+        }
+
+        .topArea {
+          height: auto;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .tabs {
+          max-width: 330px;
+          font-size: 12px;
+        }
+
+        paper-tab {
+          width: 100px;
+        }
+
+        .tabs[has-non-open-posts] {
+          font-size: 8px;
+        }
+
+        .counterInfo[has-non-open-posts] {
+          font-size: 9px;
+        }
+      }
+
+      .minHeightSection {
+        min-height: 450px;
+      }
+    </style>
+
+    <div id="topContainer">
+
+      <div id="topArea" class="large-card-wrapper layout horizontal center-center topArea" hidden$="[[group.configuration.hideGroupHeader]]">
+        <yp-group-card-large id="groupCard" class="largeCard" group="[[group]]" on-update-group="_refreshAjax"></yp-group-card-large>
+      </div>
+
+      <template is="dom-if" if="[[createFabIcon]]">
+        <div class="largeAddButton layout horizontal center-center">
+          <yp-post-card-add on-new-post="_newPost" elevation="2"></yp-post-card-add>
+        </div>
+      </template>
+
+      <div class="layout horizontal center-center" hidden$="[[group.configuration.hideAllTabs]]">
+        <paper-tabs id="paperTabs" has-non-open-posts$="[[hasNonOpenPosts]]" class="tabs" selected="{{selectedTab}}" attr-for-selected="name" focused>
+          <paper-tab id="tab1" name="open">
+            <div class="layout vertical center-center tabCounterContainer">
+              <span>[[t('posts.open')]]</span><div class="counterInfo" has-non-open-posts$="[[hasNonOpenPosts]]" id="tabCountOpen"></div>
+            </div>
+          </paper-tab>
+          <template is="dom-if" if="[[hasNonOpenPosts]]">
+            <paper-tab name="in_progress">
+              <div class="layout vertical center-center tabCounterContainer">
+                <span>[[t('posts.inProgress')]]</span><div has-non-open-posts$="[[hasNonOpenPosts]]" class="counterInfo" id="tabCountInProgress"></div>
+              </div>
+            </paper-tab>
+            <paper-tab name="successful">
+              <div class="layout vertical center-center tabCounterContainer">
+                <span>[[t('posts.successful')]]</span><div has-non-open-posts$="[[hasNonOpenPosts]]" class="counterInfo" id="tabCountSuccessful"></div>
+              </div>
+            </paper-tab>
+            <paper-tab name="failed">
+              <div class="layout vertical center-center tabCounterContainer">
+                <span>[[t('posts.failed')]]</span><div has-non-open-posts$="[[hasNonOpenPosts]]" class="counterInfo" id="tabCountFailed"></div>
+              </div>
+            </paper-tab>
+          </template>
+          <paper-tab name="news">[[t('news')]]</paper-tab>
+          <paper-tab name="map" hidden$="[[locationHidden]]">[[t('posts.map')]]</paper-tab>
+        </paper-tabs>
+      </div>
+
+      <iron-pages id="tabPages" class="tabPages" selected="{{selectedTab}}" attr-for-selected="name" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
+        <section name="open">
+          <div class="layout horizontal center-center">
+            <yp-post-list id="openPostList" selected-tab="[[selectedTab]]" list-route="[[listRoute]]" status-filter="open" tab-counter-id="tabCountOpen" searching-for="[[searchingFor]]" group="[[group]]" group-id="[[lastValidGroupId]]"></yp-post-list>
+          </div>
+        </section>
+        <section name="news" class="minHeightSection">
+          <template is="dom-if" if="[[newsTabSelected]]">
+            <ac-activities id="groupActivities" disable-new-posts="[[disableNewPosts]]" selected-tab="[[selectedTab]]" list-route="[[listRoute]]" group-id="[[group.id]]"></ac-activities>
+          </template>
+        </section>
+        <template is="dom-if" if="[[hasNonOpenPosts]]">
+          <section name="in_progress">
+            <div class="layout horizontal center-center">
+              <yp-post-list id="inProgressPostList" selected-tab="[[selectedTab]]" list-route="[[listRoute]]" status-filter="in_progress" tab-counter-id="tabCountInProgress" searching-for="[[searchingFor]]" group="[[group]]" group-id="[[lastValidGroupId]]"></yp-post-list>
+            </div>
+          </section>
+          <section name="successful">
+            <div class="layout horizontal center-center">
+              <yp-post-list id="successfulPostList" selected-tab="[[selectedTab]]" list-route="[[listRoute]]" status-filter="successful" tab-counter-id="tabCountSuccessful" searching-for="[[searchingFor]]" group="[[group]]" group-id="[[lastValidGroupId]]"></yp-post-list>
+            </div>
+          </section>
+          <section name="failed">
+            <div class="layout horizontal center-center">
+              <yp-post-list id="failedPostList" selected-tab="[[selectedTab]]" list-route="[[listRoute]]" status-filter="failed" tab-counter-id="tabCountFailed" searching-for="[[searchingFor]]" group="[[group]]" group-id="[[lastValidGroupId]]"></yp-post-list>
+            </div>
+          </section>
+        </template>
+        <section name="map" hidden$="[[locationHidden]]" class="minHeightSection">
+          <template is="dom-if" if="[[mapActive]]" restamp>
+            <yp-post-map group-id="[[group.id]]"></yp-post-map>
+          </template>
+        </section>
+      </iron-pages>
+    </div>
+
+    <div class="create-fab-wrapper layout horizontal end-justified createFabContainer" hidden$="[[post.Group.configuration.hideNewPostOnPostPage]]">
+      <template is="dom-if" if="[[createFabIcon]]">
+        <paper-fab class="createFab" icon="[[createFabIcon]]" elevation="5" wide-layout$="{{wideWidth}}" title="[[createFabTitle]]" on-tap="_newPost"></paper-fab>
+      </template>
+    </div>
+
+    <iron-scroll-threshold id="scrollTheshold"
+                           lower-threshold="150"
+                           on-lower-threshold="_loadMoreData"
+                           scroll-target="document">
+    </iron-scroll-threshold>
+
+    <iron-signals on-iron-signal-yp-language="_languageEvent"></iron-signals>
+    <iron-signals on-iron-signal-yp-refresh-group-posts="_refreshGroupPosts"></iron-signals>
+    <iron-signals on-iron-signal-yp-refresh-activities-scroll-threshold="_clearScrollThreshold"></iron-signals>
+
+    <iron-media-query query="(min-width: 1024px)" query-matches="{{wideWidth}}"></iron-media-query>
+
+    <app-route
+      route="{{idRoute}}"
+      pattern="/:id"
+      data="{{idRouteData}}"
+      tail="{{tabRoute}}">
+    </app-route>
+
+    <app-route
+      route="{{tabRoute}}"
+      pattern="/:tabName"
+      data="{{tabRouteData}}"
+      tail="{{listRoute}}">
+    </app-route>
+
+    <div class="layout horizontal center-center">
+      <yp-ajax large-spinner id="ajax" on-response="_groupsResponse"></yp-ajax>
+      <yp-ajax id="pagesAjax" on-response="_pagesResponse"></yp-ajax>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'yp-group',
+
+      behaviors: [
+        Polymer.appHelpers,
+        Polymer.ypThemeBehavior,
+        Polymer.YpNewsTabSelected
+      ],
+
+      listeners: {
+        'yp-post-count': '_updateTabPostCount'
+      },
+
+      properties: {
+
+        idRoute: Object,
+        tabRoute: Object,
+        idRouteData: Object,
+        tabRouteData: Object,
+        listRoute: Object,
+
+        createFabIcon: {
+          type: String,
+          value: null,
+          notify: true
+        },
+
+        groupId: {
+          type: Number,
+          observer: "_groupIdChanged"
+        },
+
+        group: {
+          type: Object,
+          notify: true,
+          value: null
+        },
+
+        searchingFor: {
+          type: String,
+          value: null
+        },
+
+        selectedTab: {
+          type: String,
+          value: 'open',
+          observer: '_selectedTabChanged'
+        },
+
+        hasNonOpenPosts: {
+          type: Boolean,
+          value: false,
+          observer: '_refreshTabsAndPages'
+        },
+
+        mapActive: {
+          type: Boolean,
+          value: false
+        },
+
+        lastValidGroupId: {
+          type: String
+        },
+
+        disableNewPosts: {
+          type: Boolean,
+          value: false
+        },
+
+        locationHidden: {
+          type: Boolean,
+          value: false
+        },
+
+        haveGotTabCountInfoCount: {
+          type: Number,
+          value: 0
+        },
+
+        tabCounters: {
+          type: Object,
+          value: {}
+        }
+      },
+
+      observers: [
+        '_routeIdChanged(idRouteData.id)',
+        '_routeTabChanged(tabRouteData.tabName)'
+      ],
+
+      _clearScrollThreshold: function () {
+        this.$$("#scrollTheshold").clearTriggers();
+        console.warn("Clearing scrolling triggers for group");
+      },
+
+      _loadDataOnTab: function (tabId) {
+        var tab = this.$$("#"+tabId);
+        if (tab) {
+          tab._loadMoreData();
+        } else {
+          console.error("Cant find tab "+tabId);
+        }
+      },
+
+      _loadMoreData: function () {
+        if (this.selectedTab=="open") {
+          this._loadDataOnTab("openPostList");
+        } else if (this.selectedTab=="in_progress") {
+          this._loadDataOnTab("inProgressPostList");
+        } else if (this.selectedTab=="successful") {
+          this._loadDataOnTab("successfulPostList");
+        } else if (this.selectedTab=="failed") {
+          this._loadDataOnTab("failedPostList");
+        }
+      },
+
+      _refreshGroupPosts: function () {
+        this.$$("#openPostList")._refreshGroupFromFilter();
+      },
+
+      _routeIdChanged: function (newId) {
+        if (newId) {
+          this.set('groupId', newId);
+        }
+      },
+
+      _routeTabChanged: function (newTabName) {
+        if (newTabName) {
+          this.set('selectedTab', newTabName);
+        }
+      },
+
+      _selectedTabChanged: function (tabName) {
+        if (tabName=='config') {
+          this.async(function () {
+            var configRoute = this.listRoute.path;
+            var groupId = this.idRoute.path.split("/")[1];
+            var configOverride= configRoute.substring(1, configRoute.length);
+            if (groupId && configOverride && configOverride!="")
+            window.appGlobals.setupGroupConfigOverride(groupId, configOverride);
+            this.set('selectedTab', 'open');
+          });
+        } else {
+          if (this.group) {
+            this.redirectTo("/group/" + this.group.id + '/' + tabName);
+          }
+
+          if (tabName == "map") {
+            this.set('mapActive', true);
+          } else {
+            this.set('mapActive', false);
+          }
+
+          if (tabName && window.appGlobals) {
+            window.appGlobals.activity('open', 'group_tab_' + tabName);
+          }
+
+          this.async(function () {
+            var news = this.$$("#groupActivities");
+            if (news) {
+              news.fireResize();
+            }
+          }, 300);
+        }
+      },
+
+      _refreshTabsAndPages: function () {
+        this.async(function () {
+          var pages = this.$$("#tabPages");
+          if (pages) {
+            pages.forceSynchronousItemUpdate();
+          }
+
+          var paperTabs = this.$$("#paperTabs");
+          if (paperTabs) {
+            paperTabs.forceSynchronousItemUpdate();
+            paperTabs.notifyResize();
+          }
+        }, 10);
+      },
+
+      _updateTabPostCount: function (event, tabCounterInfo) {
+        var tabCounter = this.$$('#'+tabCounterInfo.tabCounterId);
+        if (tabCounter) {
+          tabCounter.innerHTML = this.formatNumber(tabCounterInfo.count);
+          this.tabCounters[tabCounterInfo.tabCounterId] = tabCounterInfo.count;
+        }
+
+        this.haveGotTabCountInfoCount+=1;
+
+        if (this.hasNonOpenPosts) {
+          if (this.haveGotTabCountInfoCount==4) {
+            if (this.tabCounters["tabCountOpen"] && this.tabCounters["tabCountOpen"]>0) {
+              this.set('selectedTab', 'open');
+            } else if (this.tabCounters["tabCountInProgress"] && this.tabCounters["tabCountInProgress"]>0) {
+              this.set('selectedTab', 'in_progress');
+            } else if (this.tabCounters["tabCountSuccessful"] && this.tabCounters["tabCountSuccessful"]>0) {
+              this.set('selectedTab', 'successful');
+            } else if (this.tabCounters["tabCountFailed"] && this.tabCounters["tabCountFailed"]>0) {
+              this.set('selectedTab', 'failed');
+            }
+          }
+        }
+      },
+
+      _searchingForChanged: function (newValue, oldValue) {
+      },
+
+      _filterChanged: function (newValue, oldValue) {
+      },
+
+      _categoryIdChanged: function (newValue, oldValue) {
+      },
+
+      _openEdit: function () {
+        this.$$("#groupEdit").open('edit', { groupId: this.group.id });
+      },
+
+      _refreshAjax: function () {
+        this.$.ajax.generateRequest();
+        this.$$("#groupActivities").loadNewData();
+      },
+
+      ready: function () {
+      },
+
+      _groupIdChanged: function (newValue, oldValue) {
+        if (newValue && newValue!=this.lastValidGroupId) {
+          this.set('lastValidGroupId', newValue);
+          this.set('group', null);
+          this.$.groupCard.resetGroup();
+          this.$.tabCountOpen.innerHTML = "";
+          if (this.hasNonOpenPosts) {
+            this.$$("#tabCountInProgress").innerHTML = "";
+            this.$$("#tabCountSuccessful").innerHTML = "";
+            this.$$("#tabCountFailed").innerHTML = "";
+          }
+          this.set('selectedTab', 'open');
+          this.set('hasNonOpenPosts', false);
+          this.set('haveGotTabCountInfoCount', 0);
+          this.set('tabCounters', {});
+          this._getGroup();
+        }
+      },
+
+      _getGroup: function () {
+        this.$.ajax.url = '/api/groups/' + this.groupId;
+        this.$.ajax.retryMethodAfter401Login = this._getGroup.bind(this);
+        this.$.ajax.generateRequest();
+      },
+
+      _pagesResponse: function (event, detail) {
+        this.fire('yp-set-pages', detail.response);
+      },
+
+      _groupsResponse: function (event, detail, sender) {
+        this.set('group', detail.response.group);
+
+        this.set('group.configuration', window.appGlobals.overrideGroupConfigIfNeeded(this.group.id, this.group.configuration));
+
+        this.refresh();
+
+        if (this.group.configuration.canAddNewPosts!=undefined) {
+          if (this.group.configuration.canAddNewPosts===true) {
+            this.set('createFabIcon',"lightbulb-outline");
+            this.set('disableNewPosts', false);
+          } else {
+            this.set('disableNewPosts', true);
+          }
+        } else {
+          this.set('createFabIcon',"lightbulb-outline");
+        }
+
+        this.set('hasNonOpenPosts', detail.response.hasNonOpenPosts);
+
+        if (this.selectedTab=='edit') {
+          this.set('tabName', 'open');
+          this.$$("#groupCard")._openEdit();
+        }
+      },
+
+      setupTopHeaderImage: function (image) {
+        var path;
+        if (image) {
+          path = 'url(' + this.getImageFormatUrl(image, 0) + ')';
+        } else {
+          path = 'none';
+        }
+        this.customStyle['--top-area-background-image'] = path;
+        this.updateStyles();
+      },
+
+      refresh: function () {
+        if (this.group) {
+          this.fire('yp-set-home-link', {
+            type: 'group',
+            id: this.group.id,
+            name: this.group.name
+          });
+
+          if (this.group.configuration.defaultLocale!=null) {
+            this.changeLocaleIfNeeded(this.group.configuration.defaultLocale);
+          }
+
+          window.appGlobals.setCommunityAnalyticsTracker(this.group.Community.google_analytics_code);
+
+          if (this.group.theme_id!=null) {
+            this.setTheme(this.group.theme_id);
+          } else if (this.group.Community.theme_id!=null) {
+            this.setTheme(this.group.Community.theme_id);
+          } else if (this.group.Community.Domain.theme_id!=null) {
+            this.setTheme(this.group.Community.Domain.theme_id);
+          }
+
+          if (this.group.configuration.locationHidden) {
+            if (this.group.configuration.locationHidden == true) {
+              this.set('locationHidden', true);
+            } else {
+              this.set('locationHidden', false);
+            }
+          } else {
+            this.set('locationHidden', false);
+          }
+
+          this._refreshTabsAndPages();
+
+          if (this.group.GroupHeaderImages && this.group.GroupHeaderImages.length>0) {
+            this.setupTopHeaderImage(this.group.GroupHeaderImages);
+          } else {
+            this.setupTopHeaderImage(null);
+          }
+
+          this.fire("change-header", {
+            headerTitle: this.group.configuration.fixedReturnUrlName ?
+                           this.group.configuration.fixedReturnUrlName :
+                           this.group.Community.name,
+            headerDescription: this.group.Community.description,
+            headerIcon: "social:group",
+            documentTitle: this.group.name,
+            enableSearch: true,
+            hideHelpIcon: this.group.configuration.hideHelpIcon ? true : null,
+            useHardBack: this.group.configuration.fixedReturnUrl ? true : false,
+            backPath:  this.group.configuration.fixedReturnUrl ?
+                         this.group.configuration.fixedReturnUrl :
+                         "/community/" + this.group.community_id
+          });
+
+          this.$.pagesAjax.url = "/api/groups/"+this.group.id+"/pages";
+          this.$.pagesAjax.generateRequest();
+        }
+      },
+
+      _newPost: function () {
+        window.appGlobals.activity('open', 'newPost');
+        var dialog = Polymer.dom(document).querySelector('yp-app').getDialog("postEdit");
+        dialog.setup(null, this.group, true, null);
+        dialog.open('new', { groupId: this.groupId });
+      }
+    });
+  </script>
+</dom-module>
