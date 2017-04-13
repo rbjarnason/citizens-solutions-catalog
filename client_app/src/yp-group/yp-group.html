@@ -59,6 +59,7 @@
 
       .topContainer {
         margin-top: 16px;
+        height: 100%;
       }
 
       .createFab {
@@ -167,36 +168,14 @@
         <yp-group-card-large id="groupCard" class="largeCard" group="[[group]]" on-update-group="_refreshAjax"></yp-group-card-large>
       </div>
 
-      <template is="dom-if" if="[[createFabIcon]]">
-        <div class="largeAddButton layout horizontal center-center">
-          <yp-post-card-add on-new-post="_newPost" elevation="2"></yp-post-card-add>
-        </div>
-      </template>
-
       <div class="layout horizontal center-center" hidden$="[[group.configuration.hideAllTabs]]">
         <paper-tabs id="paperTabs" has-non-open-posts$="[[hasNonOpenPosts]]" class="tabs" selected="{{selectedTab}}" attr-for-selected="name" focused>
           <paper-tab id="tab1" name="open">
             <div class="layout vertical center-center tabCounterContainer">
-              <span>[[t('posts.open')]]</span><div class="counterInfo" has-non-open-posts$="[[hasNonOpenPosts]]" id="tabCountOpen"></div>
+              <span>[[t('caseStudies')]]</span><div class="counterInfo" has-non-open-posts$="[[hasNonOpenPosts]]" id="tabCountOpen"></div>
             </div>
           </paper-tab>
-          <template is="dom-if" if="[[hasNonOpenPosts]]">
-            <paper-tab name="in_progress">
-              <div class="layout vertical center-center tabCounterContainer">
-                <span>[[t('posts.inProgress')]]</span><div has-non-open-posts$="[[hasNonOpenPosts]]" class="counterInfo" id="tabCountInProgress"></div>
-              </div>
-            </paper-tab>
-            <paper-tab name="successful">
-              <div class="layout vertical center-center tabCounterContainer">
-                <span>[[t('posts.successful')]]</span><div has-non-open-posts$="[[hasNonOpenPosts]]" class="counterInfo" id="tabCountSuccessful"></div>
-              </div>
-            </paper-tab>
-            <paper-tab name="failed">
-              <div class="layout vertical center-center tabCounterContainer">
-                <span>[[t('posts.failed')]]</span><div has-non-open-posts$="[[hasNonOpenPosts]]" class="counterInfo" id="tabCountFailed"></div>
-              </div>
-            </paper-tab>
-          </template>
+          <paper-tab name="help">[[t('help')]]</paper-tab>
           <paper-tab name="news">[[t('news')]]</paper-tab>
           <paper-tab name="map" hidden$="[[locationHidden]]">[[t('posts.map')]]</paper-tab>
         </paper-tabs>
@@ -208,28 +187,17 @@
             <yp-post-list id="openPostList" selected-tab="[[selectedTab]]" list-route="[[listRoute]]" status-filter="open" tab-counter-id="tabCountOpen" searching-for="[[searchingFor]]" group="[[group]]" group-id="[[lastValidGroupId]]"></yp-post-list>
           </div>
         </section>
+
+        <section name="help" class="minHeightSection">
+          <iframe style="height: 450px !important;" src="https://docs.google.com/document/d/1OVCkpcOa4GcUmw6iDPqckMzWIaGi5Wso6UGacrIfFpw/pub?embedded=true"></iframe>
+        </section>
+
         <section name="news" class="minHeightSection">
           <template is="dom-if" if="[[newsTabSelected]]">
             <ac-activities id="groupActivities" disable-new-posts="[[disableNewPosts]]" selected-tab="[[selectedTab]]" list-route="[[listRoute]]" group-id="[[group.id]]"></ac-activities>
           </template>
         </section>
-        <template is="dom-if" if="[[hasNonOpenPosts]]">
-          <section name="in_progress">
-            <div class="layout horizontal center-center">
-              <yp-post-list id="inProgressPostList" selected-tab="[[selectedTab]]" list-route="[[listRoute]]" status-filter="in_progress" tab-counter-id="tabCountInProgress" searching-for="[[searchingFor]]" group="[[group]]" group-id="[[lastValidGroupId]]"></yp-post-list>
-            </div>
-          </section>
-          <section name="successful">
-            <div class="layout horizontal center-center">
-              <yp-post-list id="successfulPostList" selected-tab="[[selectedTab]]" list-route="[[listRoute]]" status-filter="successful" tab-counter-id="tabCountSuccessful" searching-for="[[searchingFor]]" group="[[group]]" group-id="[[lastValidGroupId]]"></yp-post-list>
-            </div>
-          </section>
-          <section name="failed">
-            <div class="layout horizontal center-center">
-              <yp-post-list id="failedPostList" selected-tab="[[selectedTab]]" list-route="[[listRoute]]" status-filter="failed" tab-counter-id="tabCountFailed" searching-for="[[searchingFor]]" group="[[group]]" group-id="[[lastValidGroupId]]"></yp-post-list>
-            </div>
-          </section>
-        </template>
+
         <section name="map" hidden$="[[locationHidden]]" class="minHeightSection">
           <template is="dom-if" if="[[mapActive]]" restamp>
             <yp-post-map group-id="[[group.id]]"></yp-post-map>

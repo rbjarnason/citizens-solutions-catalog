@@ -139,7 +139,7 @@
       }
 
       .shareIcon {
-        margin-left: 16px;
+        margin-left: 0;
         margin-top: 3px;
         --paper-share-button-icon-color: #999;
         --paper-share-button-icon-height: 46px;
@@ -193,16 +193,18 @@
         <div class="action-text up-text">[[formattedUpCount]]</div>
       </div>
 
-      <div class="action-debate" hidden$="[[_hideDebate(small,forceSmall)]]">
-        <paper-icon-button disabled="[[allDisabled]]" title$="[[t('post.debate')]]" icon="communication:chat-bubble-outline" class="action-icon debate-icon largeButton" on-tap="_goToPostIfNotHeader"></paper-icon-button>
-        <div class="action-text debate-text">[[formattedPointCount]]</div>
-      </div>
+      <div hidden>
+        <div class="action-debate" hidden$="[[_hideDebate(small,forceSmall)]]">
+          <paper-icon-button disabled="[[allDisabled]]" title$="[[t('post.debate')]]" icon="communication:chat-bubble-outline" class="action-icon debate-icon largeButton" on-tap="_goToPostIfNotHeader"></paper-icon-button>
+          <div class="action-text debate-text">[[formattedPointCount]]</div>
+        </div>
 
-      <div class="" hidden$="[[!_hideDebate(small,forceSmall)]]"></div>
+        <div class="" hidden$="[[!_hideDebate(small,forceSmall)]]"></div>
 
-      <div id="actionDown" class="action-down">
-        <paper-icon-button smaller-icons$="[[smallerIcons]]" disabled="[[allDisabled]]" title$="[[t('post.down_vote')]]" icon$="[[endorseModeIcon(endorsementButtons,'down')]]" class="action-icon down-vote-icon largeButton" on-tap="downVote"></paper-icon-button>
-        <div class="action-text down-text">[[formattedDownCount]]</div>
+        <div id="actionDown" class="action-down" hidden>
+          <paper-icon-button smaller-icons$="[[smallerIcons]]" disabled="[[allDisabled]]" title$="[[t('post.down_vote')]]" icon$="[[endorseModeIcon(endorsementButtons,'down')]]" class="action-icon down-vote-icon largeButton" on-tap="downVote"></paper-icon-button>
+          <div class="action-text down-text">[[formattedDownCount]]</div>
+        </div>
       </div>
       <div class="share" >
         <paper-share-button class="shareIcon" horizontal-align="right" id="shareButton" title$="[[t('post.shareInfo')]]" facebook google twitter popup url="[[postUrl]]"></paper-share-button>
